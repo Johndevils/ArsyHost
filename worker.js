@@ -1,19 +1,19 @@
-// worker.js - Arsynox Bot (Fixed: No ReferenceError)
+// worker.js - Arsynox Bot (Final Version)
 
-// ---------- Global Configuration (Initialized in fetch) ---------- //
+// ---------- Global Configuration ---------- //
 let BOT_TOKEN = "";
 let BOT_SECRET = "";
 let SIA_SECRET = "";
-let TELEGRAM_API = "https://api.telegram.org/bot${BOT_TOKEN}"; 
-let DB = null; // FIXED: Initialize as null, do not use BOT_USERS here
+let TELEGRAM_API = ""; // ✅ FIXED: Left empty, filled in fetch()
+let DB = null;         // ✅ FIXED: Left null, filled in fetch()
 
 // ---------- Hardcoded Config ---------- //
 const BOT_WEBHOOK = "/webhook";
-const BOT_OWNER = 6822491887; // Your Admin ID
-const BOT_CHANNEL = 1002448301166; // Your Channel ID
+const BOT_OWNER = 6822491887; 
+const BOT_CHANNEL = 1002448301166; 
 const PUBLIC_BOT = true;
 
-// Bot Welcome Image URL
+// ✅ YOUR SPECIFIC WELCOME IMAGE
 const WELCOME_IMAGE_URL = "https://arsynoxhash.dpdns.org/file/BQACAgUAAyEGAAS6vrhKAANeaVLD8wLMLaq-7RwB8mjiwr8JNqQAAv8bAAKPgphW99DIqmGKCuk2BA.jpg";
 
 // ---------- Constants ---------- //
@@ -39,11 +39,13 @@ export default {
         BOT_SECRET = env.BOT_SECRET || "ARSYNOX_SECRET_KEY_123";
         SIA_SECRET = env.SIA_SECRET || "ARSYNOX_SIA_SECRET_456";
         
-        // 2. Load KV Database (Assign env.BOT_USERS to the global DB variable here)
+        // 2. Load KV Database
         DB = env.BOT_USERS; 
 
         // 3. Construct API URL
-        if (!BOT_TOKEN) return new Response("Bot Token Not Set. Run: npx wrangler secret put BOT_TOKEN", { status: 500 });
+        if (!BOT_TOKEN) return new Response("Bot Token Not Set. Check Settings > Secrets.", { status: 500 });
+        
+        // ✅ API URL constructed here using the loaded token
         TELEGRAM_API = `https://api.telegram.org/bot${BOT_TOKEN}`;
 
         return await handleRequest(request, ctx);
@@ -110,7 +112,6 @@ async function handleWebhook(request, ctx) {
     
     try {
         const update = await request.json();
-        // Use waitUntil to ensure background tasks (like DB saves) complete
         ctx.waitUntil(processUpdate(update, request.url));
         return new Response('OK', {status: 200});
     } catch (error) {
@@ -137,7 +138,6 @@ async function processUpdate(update, workerUrl) {
             
             // --- KV: Save User for Broadcast ---
             if (DB) {
-                // We use 'catch' to ignore errors so it doesn't block the bot
                 DB.put(`user:${chatId}`, new Date().toISOString()).catch(() => {});
             }
 
@@ -261,7 +261,7 @@ async function handleBroadcast(chatId, fullCommand) {
     );
 }
 
-// ---------- Standard Messages ---------- //
+// ---------- STANDARD MESSAGES (YOUR CUSTOM WELCOME) ---------- //
 async function sendWelcomeMessage(chatId) {
     const welcomeText = `🌟 *About Arsynox File Upload & Hosting Bot* 🌟
 
@@ -309,6 +309,33 @@ async function sendHelpMessage(chatId) {
     );
 }
 
+async function editWelcomeMessage(chatId, messageId) {
+    const welcomeText = `🌟 *About Arsynox File Upload & Hosting Bot* 🌟
+
+*Your all-in-one solution for file management!*
+
+📤 *Upload to Telegram:*
+Convert URLs to Telegram files (50MB max)
+
+🌐 *File Streaming:*
+Get direct streaming links for any file
+
+*Version 2.0 | Powered by Cloudflare Workers*`;
+
+    const keyboard = {
+        inline_keyboard: [
+            [{ text: "🚀 Start Uploading", callback_data: "upload" }, { text: "🌐 Stream Info", callback_data: "stream_info" }],
+            [{ text: "📊 Speed Test", callback_data: "speedtest" }, { text: "📖 Help", callback_data: "help" }],
+            [{ text: "✅ Status", callback_data: "status" }, { text: "🔄 Refresh", callback_data: "start" }]
+        ]
+    };
+
+    await editMessage(chatId, messageId, welcomeText, {
+        parse_mode: 'Markdown',
+        reply_markup: JSON.stringify(keyboard)
+    });
+}
+
 // ---------- Callbacks ---------- //
 async function handleCallbackQuery(cb) {
     const chatId = cb.message.chat.id;
@@ -316,7 +343,7 @@ async function handleCallbackQuery(cb) {
     await answerCallbackQuery(cb.id);
     
     if (cb.data === 'speedtest') { await performSpeedTest(chatId, "https://cloudflare.com"); return; }
-    if (cb.data === 'start') { await sendWelcomeMessage(chatId); return; }
+    if (cb.data === 'start') { await editWelcomeMessage(chatId, messageId); return; }
     
     if (cb.data === 'upload') handleCommand(chatId, '/upload');
     else if (cb.data === 'stream_info') handleCommand(chatId, '/stream');
