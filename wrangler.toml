@@ -1,8 +1,3 @@
 name = "arsynox-tg-bot"
 main = "worker.js"
 compatibility_date = "2024-01-01"
-
-# Keep this part for Broadcast to work
-[[kv_namespaces]]
-binding = "BOT_USERS"
-id = "77a1a39f4f654b79bca0ab72445586e0"
