@@ -4,10 +4,10 @@
 const BOT_TOKEN = process.env.BOT_TOKEN || "";
 const BOT_WEBHOOK = "/webhook";
 const BOT_SECRET = process.env.BOT_SECRET || "ARSYNOX_SECRET_KEY_123";
-const BOT_OWNER = 123456789; // Your Telegram ID
-const BOT_CHANNEL = -100123456789; // Your channel ID
+const BOT_OWNER = m6822491887; // Your Telegram ID
+const BOT_CHANNEL = 1002448301166; // Your channel ID
 const SIA_SECRET = process.env.SIA_SECRET || "ARSYNOX_SIA_SECRET_456";
-const PUBLIC_BOT = false;
+const PUBLIC_BOT = true;
 
 // Bot Welcome Image URL
 const WELCOME_IMAGE_URL = "https://arsynoxhash.dpdns.org/file/BQACAgUAAyEGAAS6vrhKAANeaVLD8wLMLaq-7RwB8mjiwr8JNqQAAv8bAAKPgphW99DIqmGKCuk2BA.jpg";
