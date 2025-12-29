@@ -10,7 +10,7 @@ const SIA_SECRET = process.env.SIA_SECRET || "ARSYNOX_SIA_SECRET_456";
 const PUBLIC_BOT = false;
 
 // Bot Welcome Image URL
-const WELCOME_IMAGE_URL = "https://images.unsplash.com/photo-1611224923853-80b023f02d71?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80";
+const WELCOME_IMAGE_URL = "https://arsynoxhash.dpdns.org/file/BQACAgUAAyEGAAS6vrhKAANeaVLD8wLMLaq-7RwB8mjiwr8JNqQAAv8bAAKPgphW99DIqmGKCuk2BA.jpg";
 
 // ---------- Constants ---------- //
 const WHITE_METHODS = ["GET", "POST", "HEAD"];
@@ -1123,7 +1123,7 @@ class Bot {
         type: 'article', 
         id: id, 
         title: title, 
-        thumbnail_url: "https://i.ibb.co/5s8hhND/dac5fa134448.png", 
+        thumbnail_url: "https://arsynoxhash.dpdns.org/file/BQACAgUAAyEGAAS6vrhKAANeaVLD8wLMLaq-7RwB8mjiwr8JNqQAAv8bAAKPgphW99DIqmGKCuk2BA.jpg", 
         description: description, 
         input_message_content: {
             message_text: text, 
