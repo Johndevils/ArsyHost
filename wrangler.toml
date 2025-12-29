@@ -2,14 +2,7 @@ name = "arsynox-telegram-bot"
 main = "worker.js"
 compatibility_date = "2024-01-01"
 
-# -----------------------------------------------------
-# KV Database for Broadcast Feature
-# Run this command in terminal to get the ID:
-# npx wrangler kv:namespace create "BOT_USERS"
-# -----------------------------------------------------
+# Keep this part for Broadcast to work
 [[kv_namespaces]]
 binding = "BOT_USERS"
 id = "77a1a39f4f654b79bca0ab72445586e0"
-
-# Note: Do not put [vars] here for Secrets (Token).
-# Use 'npx wrangler secret put BOT_TOKEN' instead.
