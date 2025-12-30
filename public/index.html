@@ -3,16 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ArsyHost | Free Image Hosting With API</title>
+    <title>ArsyHost | Free Unlimited Image Hosting</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+        body { font-family: 'Inter', sans-serif; }
         .nav-link.active { border-bottom: 2px solid #3b82f6; color: #3b82f6; }
         .hidden-section { display: none; }
-        pre { background: #0f172a; color: #e2e8f0; padding: 1.25rem; border-radius: 0.75rem; overflow-x: auto; font-size: 0.875rem; }
+        pre { background: #0f172a; color: #e2e8f0; padding: 1.25rem; border-radius: 0.75rem; overflow-x: auto; font-size: 0.875rem; border: 1px solid #1e293b; }
+        .drop-zone--over { border-color: #3b82f6; background-color: #eff6ff; }
     </style>
 </head>
-<body class="bg-slate-50 min-h-screen">
+<body class="bg-slate-50 min-h-screen text-slate-900">
 
     <!-- Navbar -->
     <nav class="bg-white border-b border-slate-200 sticky top-0 z-50">
@@ -21,12 +24,12 @@
                 <div class="bg-blue-600 p-2 rounded-lg text-white">
                     <i class="fa-solid fa-bolt-lightning"></i>
                 </div>
-                <span class="text-xl font-bold tracking-tight">ArsyHost</span>
+                <span class="text-xl font-extrabold tracking-tight">ArsyHost</span>
             </div>
             <div class="flex space-x-6 items-center">
-                <button onclick="showSection('upload')" id="btn-upload" class="nav-link active py-5 text-sm font-semibold">Upload</button>
-                <button onclick="showSection('api')" id="btn-api" class="nav-link py-5 text-sm font-semibold text-slate-500 hover:text-blue-600">API Docs</button>
-                <button onclick="showSection('about')" id="btn-about" class="nav-link py-5 text-sm font-semibold text-slate-500 hover:text-blue-600">About</button>
+                <button onclick="showSection('upload')" id="btn-upload" class="nav-link active py-5 text-sm font-bold transition-all">Upload</button>
+                <button onclick="showSection('api')" id="btn-api" class="nav-link py-5 text-sm font-bold text-slate-500 hover:text-blue-600 transition-all">API Docs</button>
+                <button onclick="showSection('about')" id="btn-about" class="nav-link py-5 text-sm font-bold text-slate-500 hover:text-blue-600 transition-all">About</button>
             </div>
         </div>
     </nav>
@@ -35,39 +38,45 @@
         
         <!-- SECTION: UPLOAD -->
         <section id="section-upload">
-            <div class="max-w-lg mx-auto bg-white rounded-3xl shadow-xl shadow-slate-200/60 p-10 border border-slate-100">
-                <div class="text-center mb-8">
-                    <h1 class="text-3xl font-extrabold text-slate-900">Upload Image</h1>
-                    <p class="text-slate-500 mt-2">Free, fast, and permanent hosting.</p>
-                </div>
+            <div class="max-w-lg mx-auto bg-white rounded-3xl shadow-2xl shadow-blue-100/50 p-8 md:p-10 border border-slate-100 text-center">
+                <h1 class="text-3xl font-black text-slate-900 tracking-tight">Upload Image</h1>
+                <p class="text-slate-500 mt-2 mb-8">Free, fast, and permanent hosting.</p>
 
-                <div id="dropZone" class="border-2 border-dashed border-slate-200 rounded-2xl p-12 text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50/50 transition-all group">
+                <div id="dropZone" class="border-2 border-dashed border-slate-200 rounded-2xl p-12 cursor-pointer hover:border-blue-400 hover:bg-blue-50/30 transition-all group relative">
                     <input type="file" id="fileInput" class="hidden" accept="image/*">
                     <div class="bg-slate-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-blue-100 transition-colors">
                         <i class="fa-solid fa-cloud-arrow-up text-2xl text-slate-400 group-hover:text-blue-600"></i>
                     </div>
-                    <p class="text-slate-700 font-semibold">Drop your image here</p>
-                    <p class="text-xs text-slate-400 mt-2 uppercase tracking-widest font-bold">Max 20 MB</p>
+                    <p class="text-slate-700 font-bold">Drop your image here</p>
+                    <p class="text-xs text-slate-400 mt-2 uppercase tracking-widest font-black">Max 20 MB</p>
                 </div>
 
-                <div id="progressContainer" class="hidden mt-6">
-                    <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
-                        <div id="progressBar" class="bg-blue-600 h-full w-0 transition-all duration-300"></div>
+                <!-- Progress Bar -->
+                <div id="progressContainer" class="hidden mt-8">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-xs font-bold text-blue-600 uppercase">Uploading to Cloud...</span>
+                        <span id="progressPercent" class="text-xs font-bold text-blue-600">40%</span>
+                    </div>
+                    <div class="w-full bg-slate-100 rounded-full h-3 overflow-hidden">
+                        <div id="progressBar" class="bg-blue-600 h-full w-[40%] transition-all duration-500"></div>
                     </div>
                 </div>
 
-                <div id="resultArea" class="hidden mt-8 space-y-5">
-                    <div class="bg-emerald-50 text-emerald-700 p-3 rounded-xl text-sm font-medium flex items-center">
-                        <i class="fa-solid fa-circle-check mr-2 text-lg"></i> Upload Completed Successfully!
+                <!-- Result Area -->
+                <div id="resultArea" class="hidden mt-8 space-y-5 animate-in fade-in zoom-in duration-300">
+                    <div class="bg-emerald-50 text-emerald-700 p-3 rounded-xl text-sm font-bold flex items-center justify-center border border-emerald-100">
+                        <i class="fa-solid fa-circle-check mr-2 text-lg"></i> Upload Completed!
                     </div>
-                    <div>
-                        <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Public Link</label>
+                    <div class="text-left">
+                        <label class="text-xs font-black text-slate-400 uppercase tracking-wider">Direct Link</label>
                         <div class="flex mt-1.5">
                             <input type="text" id="urlOutput" readonly class="w-full p-3 bg-slate-50 border border-slate-200 rounded-l-xl text-sm font-mono outline-none focus:border-blue-500">
-                            <button onclick="copyUrl()" class="bg-blue-600 text-white px-6 py-3 rounded-r-xl hover:bg-blue-700 font-bold text-sm transition-colors">Copy</button>
+                            <button onclick="copyUrl()" class="bg-blue-600 text-white px-6 py-3 rounded-r-xl hover:bg-blue-700 font-black text-sm transition-all active:scale-95">Copy</button>
                         </div>
                     </div>
-                    <img id="preview" class="rounded-2xl w-full h-64 object-cover border border-slate-200 shadow-sm">
+                    <div class="relative group">
+                        <img id="preview" class="rounded-2xl w-full h-64 object-cover border border-slate-200 shadow-sm">
+                    </div>
                 </div>
             </div>
         </section>
@@ -76,37 +85,37 @@
         <section id="section-api" class="hidden-section">
             <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-8 md:p-12">
                 <h2 class="text-3xl font-black text-slate-900 mb-4">Developer API</h2>
-                <p class="text-slate-600 text-lg mb-10 border-l-4 border-blue-600 pl-4">Integrate high-speed image hosting into your apps with zero authentication required.</p>
+                <p class="text-slate-600 text-lg mb-10 border-l-4 border-blue-600 pl-4 font-medium">Host images directly from your applications using our global API.</p>
 
                 <div class="space-y-10">
                     <div>
-                        <div class="flex items-center space-x-3 mb-4">
-                            <span class="bg-green-600 text-white px-3 py-1 rounded-md text-xs font-black">POST</span>
-                            <code class="text-lg font-bold text-slate-700">/upload</code>
+                        <div class="flex items-center space-x-3 mb-6">
+                            <span class="bg-green-600 text-white px-4 py-1.5 rounded-lg text-xs font-black">POST</span>
+                            <code class="text-lg font-bold text-slate-700"></code>
                         </div>
                         
-                        <h4 class="font-bold text-slate-800 mb-3">1. Upload with JavaScript (Fetch)</h4>
+                        <h4 class="font-bold text-slate-800 mb-3 flex items-center"><i class="fa-brands fa-js text-yellow-500 mr-2"></i> JavaScript Fetch</h4>
                         <pre><code>const form = new FormData();
 form.append('file', imageFile);
 
-const res = await fetch('https://arsyhost.pages.dev//upload', {
+const res = await fetch('https://arsyhost.pages.dev/upload', {
     method: 'POST',
     body: form
 });
 const data = await res.json();
 console.log(data.url);</code></pre>
 
-                        <h4 class="font-bold text-slate-800 mb-3 mt-6">2. Upload with Python</h4>
+                        <h4 class="font-bold text-slate-800 mb-3 mt-8 flex items-center"><i class="fa-brands fa-python text-blue-500 mr-2"></i> Python Requests</h4>
                         <pre><code>import requests
-files = {'file': open('image.jpg', 'rb')}
-r = requests.post('https://arsyhost.pages.dev//upload', files=files)
+files = {'file': open('photo.jpg', 'rb')}
+r = requests.post('https://arsyhost.pages.dev/upload', files=files)
 print(r.json()['url'])</code></pre>
 
-                        <h4 class="font-bold text-slate-800 mb-3 mt-6">3. Response Format</h4>
+                        <h4 class="font-bold text-slate-800 mb-3 mt-8">Response Format (JSON)</h4>
                         <pre><code>{
   "success": true,
-  "url": "https://arsyhost.pages.dev//file/AgACAgUAA...",
-  "name": "photo.jpg"
+  "url": "https://arsyhost.pages.dev/file/AgACAgUAA...",
+  "name": "image.png"
 }</code></pre>
                     </div>
                 </div>
@@ -115,27 +124,30 @@ print(r.json()['url'])</code></pre>
 
         <!-- SECTION: ABOUT -->
         <section id="section-about" class="hidden-section">
-            <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-10">
-                <h2 class="text-3xl font-black text-slate-900 mb-6 text-center">Cloud Storage, Simplified.</h2>
-                <p class="text-slate-600 text-center text-lg leading-relaxed mb-10">
-                    ArsyHost is an open-source image hosting bridge. We use Telegram's powerful global data centers to store your images and Cloudflare's Edge Network to serve them to your users instantly.
+            <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-10 text-center">
+                <div class="bg-blue-600 w-20 h-20 rounded-3xl flex items-center justify-center text-white text-3xl mx-auto mb-6 shadow-xl shadow-blue-200">
+                    <i class="fa-solid fa-bolt-lightning"></i>
+                </div>
+                <h2 class="text-4xl font-black text-slate-900 mb-6">Why ArsyHost?</h2>
+                <p class="text-slate-600 text-lg leading-relaxed max-w-2xl mx-auto mb-12">
+                    ArsyHost provides a bridge between Cloudflare's high-speed CDN and Telegram's massive cloud storage. This combination gives you a permanent, fast, and free hosting solution for all your web projects.
                 </p>
                 
-                <div class="grid md:grid-cols-3 gap-8">
-                    <div class="bg-slate-50 p-6 rounded-2xl text-center">
-                        <div class="text-blue-600 text-3xl mb-3"><i class="fa-solid fa-infinity"></i></div>
-                        <h4 class="font-bold text-slate-900">Infinite</h4>
-                        <p class="text-xs text-slate-500 mt-2">No storage quotas or artificial limits.</p>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="p-8 bg-slate-50 rounded-3xl border border-slate-100">
+                        <i class="fa-solid fa-infinity text-blue-600 text-3xl mb-4"></i>
+                        <h4 class="font-black text-slate-900">No Limits</h4>
+                        <p class="text-sm text-slate-500 mt-2">Upload as many images as you need, forever.</p>
                     </div>
-                    <div class="bg-slate-50 p-6 rounded-2xl text-center">
-                        <div class="text-blue-600 text-3xl mb-3"><i class="fa-solid fa-globe"></i></div>
-                        <h4 class="font-bold text-slate-900">Global CDN</h4>
-                        <p class="text-xs text-slate-500 mt-2">Images load from the server nearest to the user.</p>
+                    <div class="p-8 bg-slate-50 rounded-3xl border border-slate-100">
+                        <i class="fa-solid fa-shield-heart text-pink-500 text-3xl mb-4"></i>
+                        <h4 class="font-black text-slate-900">Privacy</h4>
+                        <p class="text-sm text-slate-500 mt-2">Your storage backend is fully hidden from the public.</p>
                     </div>
-                    <div class="bg-slate-50 p-6 rounded-2xl text-center">
-                        <div class="text-blue-600 text-3xl mb-3"><i class="fa-solid fa-code-merge"></i></div>
-                        <h4 class="font-bold text-slate-900">Open API</h4>
-                        <p class="text-xs text-slate-500 mt-2">Easy to integrate into any frontend or app.</p>
+                    <div class="p-8 bg-slate-50 rounded-3xl border border-slate-100">
+                        <i class="fa-solid fa-gauge-high text-emerald-500 text-3xl mb-4"></i>
+                        <h4 class="font-black text-slate-900">Speed</h4>
+                        <p class="text-sm text-slate-500 mt-2">Cloudflare caches your images globally.</p>
                     </div>
                 </div>
             </div>
@@ -149,6 +161,7 @@ print(r.json()['url'])</code></pre>
             
             document.getElementById('section-' + name).classList.remove('hidden-section');
             document.getElementById('btn-' + name).classList.add('active', 'text-blue-600');
+            window.scrollTo(0, 0);
         }
 
         const dropZone = document.getElementById('dropZone');
@@ -157,25 +170,46 @@ print(r.json()['url'])</code></pre>
         const resultArea = document.getElementById('resultArea');
         const progressBar = document.getElementById('progressBar');
         const progressContainer = document.getElementById('progressContainer');
+        const progressPercent = document.getElementById('progressPercent');
 
         dropZone.onclick = () => fileInput.click();
         fileInput.onchange = (e) => handleUpload(e.target.files[0]);
 
+        // Drag and drop logic
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('drop-zone--over'); });
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drop-zone--over'));
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('drop-zone--over');
+            if (e.dataTransfer.files.length) handleUpload(e.dataTransfer.files[0]);
+        });
+
         async function handleUpload(file) {
             if (!file) return;
+            if (file.size > 20 * 1024 * 1024) { alert("File is too large (Max 20MB)"); return; }
+
             const form = new FormData();
             form.append('file', file);
 
+            // UI Initial State
             progressContainer.classList.remove('hidden');
             resultArea.classList.add('hidden');
             progressBar.style.width = '40%';
+            progressPercent.innerText = '40%';
 
             try {
                 const res = await fetch('/upload', { method: 'POST', body: form });
+                
+                if (!res.ok) {
+                    const errData = await res.json();
+                    throw new Error(errData.error || "Upload failed");
+                }
+
                 const data = await res.json();
                 
                 if (data.url) {
                     progressBar.style.width = '100%';
+                    progressPercent.innerText = '100%';
                     setTimeout(() => {
                         progressContainer.classList.add('hidden');
                         resultArea.classList.remove('hidden');
@@ -184,14 +218,19 @@ print(r.json()['url'])</code></pre>
                     }, 400);
                 }
             } catch (err) {
-                alert('Upload failed. Please check your connection.');
+                console.error(err);
+                progressContainer.classList.add('hidden');
+                alert("❌ Error: " + err.message + "\n\nTip: Check if your TG_BOT_TOKEN and TG_CHAT_ID are correct in Cloudflare Settings.");
             }
         }
 
         function copyUrl() {
             urlOutput.select();
             document.execCommand('copy');
-            alert('Link copied to clipboard!');
+            const btn = event.target;
+            const originalText = btn.innerText;
+            btn.innerText = "Copied!";
+            setTimeout(() => btn.innerText = originalText, 2000);
         }
     </script>
 </body>
