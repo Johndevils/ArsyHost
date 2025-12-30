@@ -11,111 +11,105 @@
         body { font-family: 'Inter', sans-serif; }
         .nav-link.active { border-bottom: 2px solid #3b82f6; color: #3b82f6; }
         .hidden-section { display: none; }
-        .copy-input { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px 0 0 8px; padding: 10px; font-family: monospace; font-size: 13px; width: 100%; outline: none; }
-        .copy-btn { background: #2563eb; color: white; padding: 10px 16px; border-radius: 0 8px 8px 0; font-weight: bold; font-size: 13px; transition: all 0.2s; }
+        .copy-input { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px 0 0 8px; padding: 10px; font-family: monospace; font-size: 12px; width: 100%; outline: none; color: #475569; }
+        .copy-btn { background: #2563eb; color: white; padding: 10px 16px; border-radius: 0 8px 8px 0; font-weight: bold; font-size: 12px; transition: all 0.2s; white-space: nowrap; }
         .copy-btn:hover { background: #1d4ed8; }
+        pre { background: #0f172a; color: #e2e8f0; padding: 1.25rem; border-radius: 0.75rem; overflow-x: auto; font-size: 0.875rem; border: 1px solid #1e293b; }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen text-slate-900">
 
-    <!-- Navbar -->
     <nav class="bg-white border-b border-slate-200 sticky top-0 z-50">
         <div class="max-w-5xl mx-auto px-4 flex justify-between h-16">
             <div class="flex items-center space-x-2">
                 <div class="bg-blue-600 p-2 rounded-lg text-white"><i class="fa-solid fa-bolt-lightning"></i></div>
                 <span class="text-xl font-extrabold tracking-tight">ArsyHost</span>
             </div>
-            <div class="flex space-x-6 items-center">
-                <button onclick="showSection('upload')" id="btn-upload" class="nav-link active py-5 text-sm font-bold">Upload</button>
-                <button onclick="showSection('api')" id="btn-api" class="nav-link py-5 text-sm font-bold text-slate-500 hover:text-blue-600">API Docs</button>
-                <button onclick="showSection('about')" id="btn-about" class="nav-link py-5 text-sm font-bold text-slate-500 hover:text-blue-600">About</button>
+            <div class="flex space-x-6 items-center font-bold text-sm">
+                <button onclick="showSection('upload')" id="btn-upload" class="nav-link active py-5">Upload</button>
+                <button onclick="showSection('api')" id="btn-api" class="nav-link py-5 text-slate-500">API Docs</button>
+                <button onclick="showSection('about')" id="btn-about" class="nav-link py-5 text-slate-500">About</button>
             </div>
         </div>
     </nav>
 
     <main class="max-w-4xl mx-auto py-10 px-4">
-        
-        <!-- SECTION: UPLOAD -->
         <section id="section-upload">
             <div class="max-w-xl mx-auto bg-white rounded-3xl shadow-2xl shadow-blue-100/50 p-6 md:p-10 border border-slate-100">
-                <div class="text-center mb-8">
-                    <h1 class="text-3xl font-black text-slate-900 tracking-tight">Upload Image</h1>
-                    <p class="text-slate-500 mt-2">Get permanent links for your images.</p>
-                </div>
-
                 <div id="dropZone" class="border-2 border-dashed border-slate-200 rounded-2xl p-10 text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50/30 transition-all group">
                     <input type="file" id="fileInput" class="hidden" accept="image/*">
-                    <div class="bg-slate-100 w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-blue-100 transition-colors">
-                        <i class="fa-solid fa-cloud-arrow-up text-xl text-slate-400 group-hover:text-blue-600"></i>
-                    </div>
-                    <p class="text-slate-700 font-bold">Click or Drag Image Here</p>
-                    <p class="text-xs text-slate-400 mt-1 uppercase font-black">Max 20 MB</p>
+                    <i class="fa-solid fa-cloud-arrow-up text-3xl text-slate-300 group-hover:text-blue-600 mb-4"></i>
+                    <p class="text-slate-700 font-bold">Select Image to Host</p>
+                    <p class="text-xs text-slate-400 mt-1 uppercase font-black">Free & Unlimited</p>
                 </div>
 
-                <!-- Progress -->
                 <div id="progressContainer" class="hidden mt-8">
-                    <div class="flex justify-between mb-2"><span class="text-xs font-bold text-blue-600 uppercase">Processing...</span></div>
                     <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
-                        <div id="progressBar" class="bg-blue-600 h-full w-[40%] transition-all duration-500"></div>
+                        <div id="progressBar" class="bg-blue-600 h-full w-[40%] transition-all"></div>
                     </div>
                 </div>
 
-                <!-- Result Area -->
-                <div id="resultArea" class="hidden mt-8 space-y-6">
-                    <div class="relative group">
-                        <img id="preview" class="rounded-2xl w-full h-56 object-cover border border-slate-200 shadow-sm mb-6">
-                    </div>
-
-                    <!-- Direct Link -->
+                <div id="resultArea" class="hidden mt-8 space-y-5">
+                    <img id="preview" class="rounded-2xl w-full h-48 object-cover border border-slate-200 mb-4">
+                    
                     <div>
-                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Direct Image Link</label>
+                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Preview URL</label>
                         <div class="flex mt-1">
-                            <input type="text" id="urlOutput" readonly class="copy-input">
-                            <button onclick="copyField('urlOutput')" class="copy-btn">Copy</button>
+                            <input type="text" id="previewUrl" readonly class="copy-input font-bold text-blue-600">
+                            <button onclick="copyField('previewUrl')" class="copy-btn">Copy</button>
                         </div>
                     </div>
 
-                    <!-- HTML Embed -->
                     <div>
-                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">HTML Embed Code</label>
+                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Direct Link (.jpg)</label>
                         <div class="flex mt-1">
-                            <input type="text" id="htmlOutput" readonly class="copy-input">
-                            <button onclick="copyField('htmlOutput')" class="copy-btn">Copy</button>
+                            <input type="text" id="directUrl" readonly class="copy-input">
+                            <button onclick="copyField('directUrl')" class="copy-btn">Copy</button>
                         </div>
                     </div>
 
-                    <!-- Markdown -->
                     <div>
-                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Markdown Code</label>
+                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">HTML Embed</label>
                         <div class="flex mt-1">
-                            <input type="text" id="mdOutput" readonly class="copy-input">
-                            <button onclick="copyField('mdOutput')" class="copy-btn">Copy</button>
+                            <input type="text" id="htmlUrl" readonly class="copy-input">
+                            <button onclick="copyField('htmlUrl')" class="copy-btn">Copy</button>
                         </div>
                     </div>
 
-                    <button onclick="location.reload()" class="w-full py-3 text-sm font-bold text-blue-600 bg-blue-50 rounded-xl hover:bg-blue-100 transition-all mt-4">
-                        <i class="fa-solid fa-rotate-left mr-2"></i> Upload Another Image
-                    </button>
+                    <button onclick="location.reload()" class="w-full py-3 text-sm font-bold text-blue-600 bg-blue-50 rounded-xl">Upload New</button>
                 </div>
             </div>
         </section>
 
-        <!-- API DOCS & ABOUT (Pehle wale code jaisa hi rahega) -->
-        <section id="section-api" class="hidden-section"> <!-- Pehle wala content --> </section>
-        <section id="section-about" class="hidden-section"> <!-- Pehle wala content --> </section>
+        <section id="section-api" class="hidden-section bg-white p-8 rounded-3xl border border-slate-200">
+            <h2 class="text-2xl font-black mb-4">API Documentation</h2>
+            <p class="text-slate-600 mb-6">Integrate ArsyHost into your apps.</p>
+            <div class="space-y-4">
+                <div class="flex items-center space-x-2"><span class="bg-green-600 text-white px-2 py-1 rounded text-xs font-bold">POST</span> <code>/upload</code></div>
+                <pre><code>// Example
+const res = await fetch('https://arsyhost.pages.dev/upload', {
+  method: 'POST',
+  body: formData
+});</code></pre>
+            </div>
+        </section>
+
+        <section id="section-about" class="hidden-section bg-white p-8 rounded-3xl border border-slate-200 text-center">
+            <h2 class="text-2xl font-black mb-4">Unlimited Storage</h2>
+            <p class="text-slate-600">ArsyHost uses Telegram Cloud to provide free and permanent image hosting.</p>
+        </section>
     </main>
 
     <script>
-        function showSection(name) {
+        function showSection(id) {
             document.querySelectorAll('section').forEach(s => s.classList.add('hidden-section'));
             document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active', 'text-blue-600'));
-            document.getElementById('section-' + name).classList.remove('hidden-section');
-            document.getElementById('btn-' + name).classList.add('active', 'text-blue-600');
+            document.getElementById('section-' + id).classList.remove('hidden-section');
+            document.getElementById('btn-' + id).classList.add('active', 'text-blue-600');
         }
 
         const dropZone = document.getElementById('dropZone');
         const fileInput = document.getElementById('fileInput');
-        
         dropZone.onclick = () => fileInput.click();
         fileInput.onchange = (e) => handleUpload(e.target.files[0]);
 
@@ -123,50 +117,37 @@
             if (!file) return;
             const form = new FormData();
             form.append('file', file);
-
             document.getElementById('progressContainer').classList.remove('hidden');
             document.getElementById('dropZone').classList.add('hidden');
 
             try {
                 const res = await fetch('/upload', { method: 'POST', body: form });
                 const data = await res.json();
-                
                 if (data.url) {
-                    document.getElementById('progressBar').style.width = '100%';
+                    const fileId = data.url.split('/').pop();
+                    const cleanUrl = window.location.origin + "/file/" + fileId + ".jpg";
                     
+                    document.getElementById('progressBar').style.width = '100%';
                     setTimeout(() => {
                         document.getElementById('progressContainer').classList.add('hidden');
                         document.getElementById('resultArea').classList.remove('hidden');
                         
-                        // Set Inputs
-                        const directUrl = data.url;
-                        document.getElementById('urlOutput').value = directUrl;
-                        document.getElementById('htmlOutput').value = `<img src="${directUrl}" alt="ArsyHost Image">`;
-                        document.getElementById('mdOutput').value = `![ArsyHost Image](${directUrl})`;
-                        document.getElementById('preview').src = directUrl;
+                        document.getElementById('previewUrl').value = cleanUrl + "?preview=true";
+                        document.getElementById('directUrl').value = cleanUrl;
+                        document.getElementById('htmlUrl').value = `<img src="${cleanUrl}" alt="Hosted by ArsyHost">`;
+                        document.getElementById('preview').src = cleanUrl;
                     }, 400);
-                } else {
-                    throw new Error(data.error || "Upload failed");
                 }
-            } catch (err) {
-                alert("❌ Error: " + err.message);
-                location.reload();
-            }
+            } catch (err) { alert("Upload Failed"); location.reload(); }
         }
 
         function copyField(id) {
-            const input = document.getElementById(id);
-            input.select();
+            const el = document.getElementById(id);
+            el.select();
             document.execCommand('copy');
-            
             const btn = event.target;
-            const oldText = btn.innerText;
-            btn.innerText = "Saved!";
-            btn.style.background = "#059669";
-            setTimeout(() => { 
-                btn.innerText = oldText; 
-                btn.style.background = "#2563eb";
-            }, 2000);
+            btn.innerText = "Copied!";
+            setTimeout(() => btn.innerText = "Copy", 2000);
         }
     </script>
 </body>
