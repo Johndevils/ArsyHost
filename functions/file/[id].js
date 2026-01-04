@@ -1,44 +1,47 @@
-export async function onRequestGet(context) {
-    const { params, env, request } = context;
-    let fileId = params.id;
+export async function onRequestGet({ params, env }) {
 
-    // 1. Strip extensions if present (e.g. abc.jpg -> abc)
-    fileId = fileId.replace(/\.(jpg|jpeg|png|gif|webp)$/i, "");
+    const fileId = params.id;
+    if (!fileId) return new Response("Missing file id", { status: 400 });
 
-    const corsHeaders = {
-        "Access-Control-Allow-Origin": "*",
-        "Cache-Control": "public, max-age=31536000, immutable",
-    };
-
-    try {
-        if (!env.TG_BOT_TOKEN) return new Response("Bot Token Missing", { status: 500 });
-
-        // 2. Fetch File Path from Telegram
-        const getFile = await fetch(`https://api.telegram.org/bot${env.TG_BOT_TOKEN}/getFile?file_id=${fileId}`);
-        const pathData = await getFile.json();
-
-        if (!pathData.ok) return new Response("File Not Found", { status: 404 });
-
-        const filePath = pathData.result.file_path;
-
-        // 3. Download from Telegram
-        const imageRes = await fetch(`https://api.telegram.org/file/bot${env.TG_BOT_TOKEN}/${filePath}`);
-        
-        const responseHeaders = new Headers(corsHeaders);
-        responseHeaders.set("Content-Type", imageRes.headers.get("Content-Type") || "image/jpeg");
-
-        // 4. Handle Preview flag
-        const { searchParams } = new URL(request.url);
-        if (searchParams.get("preview") === "true") {
-            responseHeaders.set("Content-Disposition", "inline");
-        }
-
-        return new Response(imageRes.body, {
-            status: 200,
-            headers: responseHeaders
-        });
-
-    } catch (err) {
-        return new Response("Internal Error: " + err.message, { status: 500 });
+    if (!env.TG_BOT_TOKEN) {
+        return new Response("Bot token missing", { status: 500 });
     }
+
+    // 1. getFile
+    const metaRes = await fetch(
+        `https://api.telegram.org/bot${env.TG_BOT_TOKEN}/getFile?file_id=${fileId}`
+    );
+    const meta = await metaRes.json();
+
+    if (!meta.ok) return new Response("File not found", { status: 404 });
+
+    const filePath = meta.result.file_path;
+
+    // 2. download binary
+    const fileRes = await fetch(
+        `https://api.telegram.org/file/bot${env.TG_BOT_TOKEN}/${filePath}`
+    );
+
+    if (!fileRes.ok) {
+        return new Response("Failed to fetch file", { status: 502 });
+    }
+
+    // 3. detect mime
+    const ext = filePath.split(".").pop().toLowerCase();
+    const mime = {
+        jpg: "image/jpeg",
+        jpeg: "image/jpeg",
+        png: "image/png",
+        webp: "image/webp",
+        gif: "image/gif"
+    }[ext] || "application/octet-stream";
+
+    return new Response(fileRes.body, {
+        headers: {
+            "Content-Type": mime,
+            "Cache-Control": "public, max-age=31536000, immutable",
+            "Access-Control-Allow-Origin": "*",
+            "Content-Disposition": "inline"
+        }
+    });
 }
